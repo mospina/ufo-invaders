@@ -9,6 +9,8 @@ elm init
 npm install -g elm-test
 elm-test init
 
+To learn more about testing in elm: https://elmprogramming.com/easy-to-test.html
+
 ## Development environment
 
 elm reactor
@@ -20,6 +22,8 @@ elm install timjs/elm-collage
 
 ## Images and assets
 
-https://opengameart.org/
-starfighter: https://opengameart.org/content/starfighter-x-3
-Nave: https://opengameart.org/content/alien-spaceship
+Images from https://opengameart.org/
+
+- starfighter: https://opengameart.org/content/starfighter-x-3
+- alien-spaceship: https://opengameart.org/content/alien-spaceship
+- missile: https://opengameart.org/content/missile-32x32
