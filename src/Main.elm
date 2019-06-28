@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), init, main, subscriptions, update, view)
+module Main exposing (Game, Invader, Missile, Model, Msg(..), State(..), Tank, assetsDir, gameHeight, gameWidth, hitRange, init, invaderImage, invaderRate, invaderXspeed, invaderYspeed, main, missileImage, missileSpeed, subscriptions, tankImage, tankSpeed, tankY, update, view)
 
 import Browser
 import Collage exposing (image)
@@ -83,6 +83,11 @@ hitRange =
 
 type alias Tank =
     { x : Int }
+
+
+initialTank : Tank
+initialTank =
+    Tank (gameWidth // 2)
 
 
 
@@ -200,6 +205,11 @@ type alias Game =
     }
 
 
+initialGame : Game
+initialGame =
+    Game initialTank [] []
+
+
 
 {-
    -- Game is: Game Tank [Invader] [Missile]
@@ -222,13 +232,68 @@ type alias Game =
 -}
 
 
+type State
+    = Start
+    | Play
+    | GameOver
+
+
+
+{- State is one of:
+       - Start
+       - Play
+       - GameOver
+     interp. the state of the curent game
+     -- <examples are redundant for enumerations>
+
+   fnForState : State -> ...
+   fnForState state =
+     case state of
+       Red -> ...
+       Yellow -> ...
+       Green -> ...
+
+   -- Template rules used:
+   --  - one of: 3 cases
+   --    - atomic distinct: Red
+   --    - atomic distinct: Yellow
+   --    - atomic distinct: Green
+-}
+
+
 type alias Model =
-    {}
+    { state : State
+    , game : Game
+    }
+
+
+initialModel =
+    Model Start initialGame
+
+
+
+{-
+   -- Model is: Model State Game
+   -- interp. a model with the state of the game and the game itself
+
+   model  = Model Start <| Game (Tank 8) [] []
+
+   fnForModel : Model -> ...
+   fnForModel model =
+     ... fnForState model.state              -- State
+         fnForGame  model.game               -- Game
+
+   -- Template rules used:
+   --   - compound: 2 fields
+   --   - references:
+   --     - state field is State
+   --     - game field is Game
+-}
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( {}
+    ( initialModel
     , Cmd.none
     )
 
@@ -246,12 +311,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Left ->
-            ( {}
+            ( initialModel
             , Cmd.none
             )
 
         Right ->
-            ( {}
+            ( initialModel
             , Cmd.none
             )
 
