@@ -27,3 +27,8 @@ Images from https://opengameart.org/
 - starfighter: https://opengameart.org/content/starfighter-x-3
 - alien-spaceship: https://opengameart.org/content/alien-spaceship
 - missile: https://opengameart.org/content/missile-32x32
+
+## Notes and things
+
+[Elm game base](https://github.com/ohanhi/elm-game-base)
+[What key was pressed?](https://github.com/elm/browser/blob/1.0.0/notes/keyboard.md)

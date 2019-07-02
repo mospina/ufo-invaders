@@ -1,9 +1,11 @@
 module Main exposing (Game, Invader, Missile, Model, Msg(..), State(..), Tank, assetsDir, gameHeight, gameWidth, halfGameHeight, halfGameWidth, hitRange, init, invaderHeight, invaderImage, invaderRate, invaderWidth, invaderXspeed, invaderYspeed, main, missileHeight, missileImage, missileSpeed, missileWidth, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, view)
 
 import Browser
+import Browser.Events as Events
 import Collage exposing (Collage, group, image, shift)
 import Collage.Render exposing (svgBox)
 import Html exposing (..)
+import Json.Decode as Decode
 
 
 
@@ -339,19 +341,38 @@ init _ =
 
 
 type Msg
-    = Left
-    | Right
+    = KeyDown Key
+    | KeyUp Key
+    | Tick Float
+    | NoOp
+
+
+
+{- Msg is one of:
+       - KeyDown Key
+       - KeyUp Key
+       - Tick Float
+       - NoOp
+     interp. KeyDown and KeyUp are keyboard events. Tick is a time based event
+     -- <examples are redundant for enumerations>
+
+   fnForMsg : Msg -> ...
+   fnForMsg msg =
+     case msg of
+       KeyDown key -> ... key
+       KeyUp key -> ... key
+       Tick x -> ... x
+       NoOp -> ...
+
+   -- Template rules used:
+   --  - one of: 4 cases
+-}
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Left ->
-            ( initialModel
-            , Cmd.none
-            )
-
-        Right ->
+        _ ->
             ( initialModel
             , Cmd.none
             )
@@ -361,9 +382,41 @@ update msg model =
 -- SUBSCRIPTIONS
 
 
+type Key
+    = Space
+    | ArrowLeft
+    | ArrowRight
+    | Unknown
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch
+        [ Events.onAnimationFrameDelta Tick
+        , Events.onKeyDown (Decode.map KeyDown keyDecoder)
+        , Events.onKeyUp (Decode.map KeyUp keyDecoder)
+        ]
+
+
+keyDecoder : Decode.Decoder Key
+keyDecoder =
+    Decode.map fromCode (Decode.field "key" Decode.string)
+
+
+fromCode : String -> Key
+fromCode keyCode =
+    case keyCode of
+        " " ->
+            Space
+
+        "ArrowLeft" ->
+            ArrowLeft
+
+        "ArrowRight" ->
+            ArrowRight
+
+        _ ->
+            Unknown
 
 
 
