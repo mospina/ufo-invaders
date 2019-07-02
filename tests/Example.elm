@@ -29,11 +29,11 @@ invader1 =
 
 
 invader2 =
-    Invader (halfGameHeight / 2) (halfGameWidth / 2) -3
+    Invader (halfGameWidth / 2) (halfGameHeight / 2) -3
 
 
 invader3 =
-    Invader (0 - halfGameHeight) (0 - halfGameWidth) 3
+    Invader (0 - halfGameWidth) (0 - halfGameHeight) 3
 
 
 emptyListOfInvaders =
@@ -108,8 +108,8 @@ testRenderFunctions =
                             view initialModel
 
                         initialView =
-                            svgBox ( gameHeight, gameWidth ) <|
-                                group [ image ( tankHeight, tankWidth ) tankImage |> shift ( tankCenter.x, tankY ) ]
+                            svgBox ( gameWidth, gameHeight ) <|
+                                group [ image ( tankWidth, tankHeight ) tankImage |> shift ( tankCenter.x, tankY ) ]
                     in
                     renderedView |> Expect.equal initialView
             , test "return a play  view" <|
@@ -119,20 +119,20 @@ testRenderFunctions =
                             view updatedModel
 
                         updatedView =
-                            svgBox ( gameHeight, gameWidth ) <|
+                            svgBox ( gameWidth, gameHeight ) <|
                                 group
-                                    [ image ( tankHeight, tankWidth ) tankImage |> shift ( tankLeft.x, tankY )
-                                    , image ( invaderHeight, invaderWidth ) invaderImage
+                                    [ image ( tankWidth, tankHeight ) tankImage |> shift ( tankLeft.x, tankY )
+                                    , image ( invaderWidth, invaderHeight ) invaderImage
                                         |> shift ( invader1.x, invader1.y )
-                                    , image ( invaderHeight, invaderWidth ) invaderImage
+                                    , image ( invaderWidth, invaderHeight ) invaderImage
                                         |> shift ( invader2.x, invader2.y )
-                                    , image ( invaderHeight, invaderWidth ) invaderImage
+                                    , image ( invaderWidth, invaderHeight ) invaderImage
                                         |> shift ( invader3.x, invader3.y )
-                                    , image ( missileHeight, missileWidth ) missileImage
+                                    , image ( missileWidth, missileHeight ) missileImage
                                         |> shift ( missile1.x, missile1.y )
-                                    , image ( missileHeight, missileWidth ) missileImage
+                                    , image ( missileWidth, missileHeight ) missileImage
                                         |> shift ( missile2.x, missile2.y )
-                                    , image ( missileHeight, missileWidth ) missileImage
+                                    , image ( missileWidth, missileHeight ) missileImage
                                         |> shift ( missile3.x, missile3.y )
                                     ]
                     in
@@ -147,18 +147,18 @@ testRenderFunctions =
 
                         fullGameCollage =
                             group
-                                [ image ( tankHeight, tankWidth ) tankImage |> shift ( tankLeft.x, tankY )
-                                , image ( invaderHeight, invaderWidth ) invaderImage
+                                [ image ( tankWidth, tankHeight ) tankImage |> shift ( tankLeft.x, tankY )
+                                , image ( invaderWidth, invaderHeight ) invaderImage
                                     |> shift ( invader1.x, invader1.y )
-                                , image ( invaderHeight, invaderWidth ) invaderImage
+                                , image ( invaderWidth, invaderHeight ) invaderImage
                                     |> shift ( invader2.x, invader2.y )
-                                , image ( invaderHeight, invaderWidth ) invaderImage
+                                , image ( invaderWidth, invaderHeight ) invaderImage
                                     |> shift ( invader3.x, invader3.y )
-                                , image ( missileHeight, missileWidth ) missileImage
+                                , image ( missileWidth, missileHeight ) missileImage
                                     |> shift ( missile1.x, missile1.y )
-                                , image ( missileHeight, missileWidth ) missileImage
+                                , image ( missileWidth, missileHeight ) missileImage
                                     |> shift ( missile2.x, missile2.y )
-                                , image ( missileHeight, missileWidth ) missileImage
+                                , image ( missileWidth, missileHeight ) missileImage
                                     |> shift ( missile3.x, missile3.y )
                                 ]
                     in
@@ -172,7 +172,7 @@ testRenderFunctions =
                             renderTank tankLeft
 
                         tankLeftCollage =
-                            image ( tankHeight, tankWidth ) tankImage |> shift ( tankLeft.x, tankY )
+                            image ( tankWidth, tankHeight ) tankImage |> shift ( tankLeft.x, tankY )
                     in
                     returnedTankCollage |> Expect.equal tankLeftCollage
             ]
@@ -184,11 +184,11 @@ testRenderFunctions =
                             renderListOfInvaders listOfInvaders
 
                         invadersCollageList =
-                            [ image ( invaderHeight, invaderWidth ) invaderImage
+                            [ image ( invaderWidth, invaderHeight ) invaderImage
                                 |> shift ( invader1.x, invader1.y )
-                            , image ( invaderHeight, invaderWidth ) invaderImage
+                            , image ( invaderWidth, invaderHeight ) invaderImage
                                 |> shift ( invader2.x, invader2.y )
-                            , image ( invaderHeight, invaderWidth ) invaderImage
+                            , image ( invaderWidth, invaderHeight ) invaderImage
                                 |> shift ( invader3.x, invader3.y )
                             ]
                     in
@@ -200,11 +200,11 @@ testRenderFunctions =
                             renderListOfMissiles listOfMissiles
 
                         missilesCollageList =
-                            [ image ( missileHeight, missileWidth ) missileImage
+                            [ image ( missileWidth, missileHeight ) missileImage
                                 |> shift ( missile1.x, missile1.y )
-                            , image ( missileHeight, missileWidth ) missileImage
+                            , image ( missileWidth, missileHeight ) missileImage
                                 |> shift ( missile2.x, missile2.y )
-                            , image ( missileHeight, missileWidth ) missileImage
+                            , image ( missileWidth, missileHeight ) missileImage
                                 |> shift ( missile3.x, missile3.y )
                             ]
                     in
@@ -216,7 +216,7 @@ testRenderFunctions =
                             renderInvader invader1
 
                         invaderCollage =
-                            image ( invaderHeight, invaderWidth ) invaderImage
+                            image ( invaderWidth, invaderHeight ) invaderImage
                                 |> shift ( invader1.x, invader1.y )
                     in
                     returnedCollage |> Expect.equal invaderCollage
@@ -227,7 +227,7 @@ testRenderFunctions =
                             renderMissile missile1
 
                         missileCollage =
-                            image ( missileHeight, missileWidth ) missileImage
+                            image ( missileWidth, missileHeight ) missileImage
                                 |> shift ( missile1.x, missile1.y )
                     in
                     returnedCollage |> Expect.equal missileCollage

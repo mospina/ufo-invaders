@@ -54,7 +54,7 @@ tankHeight =
 
 
 tankY =
-    0 - (halfGameHeight - (tankHeight / 2))
+    -1 * (halfGameHeight - tankHeight)
 
 
 tankImage =
@@ -373,7 +373,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    svgBox ( gameHeight, gameWidth ) <| render model.game
+    svgBox ( gameWidth, gameHeight ) <| render model.game
 
 
 render : Game -> Collage msg
@@ -387,7 +387,7 @@ render game =
 
 renderTank : Tank -> Collage msg
 renderTank tank =
-    image ( tankHeight, tankWidth ) tankImage |> shift ( tank.x, tankY )
+    image ( tankWidth, tankHeight ) tankImage |> shift ( tank.x, tankY )
 
 
 renderListOfInvaders : List Invader -> List (Collage msg)
@@ -412,9 +412,9 @@ renderListOfMissiles missiles =
 
 renderInvader : Invader -> Collage msg
 renderInvader invader =
-    image ( invaderHeight, invaderWidth ) invaderImage |> shift ( invader.x, invader.y )
+    image ( invaderWidth, invaderHeight ) invaderImage |> shift ( invader.x, invader.y )
 
 
 renderMissile : Missile -> Collage msg
 renderMissile missile =
-    image ( missileHeight, missileWidth ) missileImage |> shift ( missile.x, missile.y )
+    image ( missileWidth, missileHeight ) missileImage |> shift ( missile.x, missile.y )
