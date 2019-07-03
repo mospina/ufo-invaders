@@ -13,15 +13,15 @@ import Test exposing (..)
 
 
 tankCenter =
-    Tank 0
+    Tank 0 0
 
 
 tankLeft =
-    Tank (0 - (gameWidth / 2))
+    Tank (0 - (gameWidth / 2)) -1
 
 
 tankRigth =
-    Tank (gameWidth / 2)
+    Tank (gameWidth / 2) 1
 
 
 invader1 =

@@ -117,30 +117,33 @@ hitRange =
 
 
 type alias Tank =
-    { x : Float }
+    { x : Float
+    , dir : Float
+    }
 
 
 initialTank : Tank
 initialTank =
-    Tank 0
+    Tank 0 0
 
 
 
 {-
-   -- Tank is: Tank x
-   -- interp. a tank at position x, tankY
-              tank move at speed tankSpeed pixels per clock-tick
-              direction is given by the arrow key < or >
-           NOTE: the starter file declares a direction dir as Integer[-1 1]
+   -- Tank is: Tank Float Float[-1, 1]
+   -- interp. a tank at position x, (tankY)
+              with a direction dir (left -1, right 1, no movement 0)
+              tank move at speed (tankSpeed * dir) pixels per clock-tick
 
-   tank  = Tank 6
+   tank  = Tank 6 1  -- going right
+   tank  = Tank 6 -1 -- going left
 
    fnForTank : Tank -> ...
    fnForTank tank =
-     ... tank.x  -- number
+     ... tank.x    -- number
+     ... tank.dir  -- number
 
    -- Template rules used:
-   --   - compound: 1 fields
+   --   - compound: 2 fields
 -}
 
 
@@ -253,7 +256,7 @@ initialGame =
    -- Game is: Game Tank [Invader] [Missile]
    -- interp. a game with the defending tank, the current invaders and fired missiles
 
-   game  = Game (Tank 8) [Invader 5 10] [Missile 10 20]
+   game  = Game (Tank 8 -1) [Invader 5 10] [Missile 10 20]
 
    fnForGame : Game -> ...
    fnForGame game =
@@ -314,7 +317,7 @@ initialModel =
    -- Model is: Model State Game
    -- interp. a model with the state of the game and the game itself
 
-   model  = Model Start <| Game (Tank 8) [] []
+   model  = Model Start <| Game (Tank 8 0) [] []
 
    fnForModel : Model -> ...
    fnForModel model =
