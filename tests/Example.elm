@@ -260,8 +260,17 @@ testUpdateFunctions =
                                 Game fullGame.tank fullGame.invaders (newMissile :: fullGame.missiles)
                         in
                         model |> Expect.equal { updatedModel | game = updatedGame }
+                , test "Pressing left move the tank to the left when state is Play" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyDown ArrowRight) updatedModel
 
-                -- , test "Pressing left move the tank to the left when state is Play"
+                            expectedGame =
+                                Game { tankLeft | dir = 1 } listOfInvaders listOfMissiles
+                        in
+                        model |> Expect.equal { updatedModel | game = expectedGame }
+
                 -- , test "Pressing right move the tank to the right when state is Play"
                 , test "shootMissile add a new missile to the game" <|
                     \_ ->
