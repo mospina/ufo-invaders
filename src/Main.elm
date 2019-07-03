@@ -399,10 +399,18 @@ keyDown key model =
                 { model | game = shootMissile model.game }
 
         ArrowLeft ->
-            model
+            if model.state == Play then
+                { model | game = updateTankDirection model.game -1 }
+
+            else
+                model
 
         ArrowRight ->
-            model
+            if model.state == Play then
+                { model | game = updateTankDirection model.game 1 }
+
+            else
+                model
 
         _ ->
             model
@@ -410,7 +418,23 @@ keyDown key model =
 
 keyUp : Key -> Model -> Model
 keyUp key model =
-    initialModel
+    case key of
+        ArrowLeft ->
+            if model.state == Play then
+                { model | game = updateTankDirection model.game 0 }
+
+            else
+                model
+
+        ArrowRight ->
+            if model.state == Play then
+                { model | game = updateTankDirection model.game 0 }
+
+            else
+                model
+
+        _ ->
+            model
 
 
 onTick : Float -> Model -> Model
@@ -425,6 +449,15 @@ shootMissile game =
             Missile game.tank.x tankY
     in
     { game | missiles = newMissile :: game.missiles }
+
+
+updateTankDirection : Game -> Float -> Game
+updateTankDirection game newDir =
+    let
+        updatedTank =
+            Tank game.tank.x newDir
+    in
+    { game | tank = updatedTank }
 
 
 

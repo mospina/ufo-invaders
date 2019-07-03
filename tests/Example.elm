@@ -260,7 +260,7 @@ testUpdateFunctions =
                                 Game fullGame.tank fullGame.invaders (newMissile :: fullGame.missiles)
                         in
                         model |> Expect.equal { updatedModel | game = updatedGame }
-                , test "Pressing left move the tank to the left when state is Play" <|
+                , test "Pressing right change direction to the right when state is Play" <|
                     \_ ->
                         let
                             ( model, _ ) =
@@ -270,8 +270,19 @@ testUpdateFunctions =
                                 Game { tankLeft | dir = 1 } listOfInvaders listOfMissiles
                         in
                         model |> Expect.equal { updatedModel | game = expectedGame }
+                , test "Pressing left change direction to the left when state is Play" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyDown ArrowLeft) { initialModel | state = Play }
 
-                -- , test "Pressing right move the tank to the right when state is Play"
+                            expectedGame =
+                                Game { tankCenter | dir = -1 } [] []
+
+                            expectedModel =
+                                Model Play expectedGame
+                        in
+                        model |> Expect.equal expectedModel
                 , test "shootMissile add a new missile to the game" <|
                     \_ ->
                         let
@@ -283,8 +294,39 @@ testUpdateFunctions =
                         in
                         returnedGame |> Expect.equal { initialGame | missiles = newMissile :: initialGame.missiles }
                 ]
+            , describe "KeyUp"
+                [ test "Releasing Space does nothing" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyUp Space) updatedModel
+                        in
+                        model |> Expect.equal updatedModel
+                , test "Releasing right change direction to static when state is Play" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyUp ArrowRight) updatedModel
 
-            -- , describe "KeyUp" []
+                            expectedGame =
+                                Game { tankLeft | dir = 0 } listOfInvaders listOfMissiles
+                        in
+                        model |> Expect.equal { updatedModel | game = expectedGame }
+                , test "Releasing left change direction to static when state is Play" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyUp ArrowLeft) { initialModel | state = Play }
+
+                            expectedGame =
+                                Game { tankCenter | dir = 0 } [] []
+
+                            expectedModel =
+                                Model Play expectedGame
+                        in
+                        model |> Expect.equal expectedModel
+                ]
+
             -- , describe "Tick" []
             ]
         ]
