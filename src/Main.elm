@@ -1,4 +1,4 @@
-module Main exposing (Game, Invader, Missile, Model, Msg(..), State(..), Tank, assetsDir, gameHeight, gameWidth, halfGameHeight, halfGameWidth, hitRange, init, invaderHeight, invaderImage, invaderRate, invaderWidth, invaderXspeed, invaderYspeed, main, missileHeight, missileImage, missileSpeed, missileWidth, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, view)
+module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, halfGameHeight, halfGameWidth, hitRange, init, initialGame, initialModel, initialTank, invaderHeight, invaderImage, invaderRate, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, main, missileHeight, missileImage, missileSpeed, missileWidth, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, view)
 
 import Browser
 import Browser.Events as Events
@@ -293,9 +293,9 @@ type State
 
    -- Template rules used:
    --  - one of: 3 cases
-   --    - atomic distinct: Red
-   --    - atomic distinct: Yellow
-   --    - atomic distinct: Green
+   --    - atomic distinct: Start
+   --    - atomic distinct: Play
+   --    - atomic distinct: GameOver
 -}
 
 
@@ -372,10 +372,56 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        KeyDown key ->
+            ( keyDown key model, Cmd.none )
+
+        KeyUp key ->
+            ( keyUp key model, Cmd.none )
+
+        Tick tick ->
+            ( onTick tick model, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
+
+
+keyDown : Key -> Model -> Model
+keyDown key model =
+    case key of
+        Space ->
+            if model.state == Start then
+                { model | state = Play }
+
+            else
+                { model | game = shootMissile model.game }
+
+        ArrowLeft ->
+            model
+
+        ArrowRight ->
+            model
+
         _ ->
-            ( initialModel
-            , Cmd.none
-            )
+            model
+
+
+keyUp : Key -> Model -> Model
+keyUp key model =
+    initialModel
+
+
+onTick : Float -> Model -> Model
+onTick tick model =
+    initialModel
+
+
+shootMissile : Game -> Game
+shootMissile game =
+    let
+        newMissile =
+            Missile game.tank.x tankY
+    in
+    { game | missiles = newMissile :: game.missiles }
 
 
 
@@ -387,6 +433,28 @@ type Key
     | ArrowLeft
     | ArrowRight
     | Unknown
+
+
+
+{- Key is one of:
+       - Space
+       - ArrowLeft
+       - ArrowRight
+       - Unknown
+     interp. Key is the code of the key pressed
+     -- <examples are redundant for enumerations>
+
+   fnForKey : Key -> ...
+   fnForKey key =
+     case key of
+       Space -> ...
+       ArrowLeft -> ...
+       ArrowRight -> ...
+       _ -> ...
+
+   -- Template rules used:
+   --  - one of: 4 cases
+-}
 
 
 subscriptions : Model -> Sub Msg

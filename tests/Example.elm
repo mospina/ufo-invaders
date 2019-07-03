@@ -1,4 +1,4 @@
-module Example exposing (testInit, testRenderFunctions)
+module Example exposing (testInit, testRenderFunctions, testUpdateFunctions)
 
 import Collage exposing (group, image, shift)
 import Collage.Render exposing (svgBox)
@@ -231,5 +231,51 @@ testRenderFunctions =
                                 |> shift ( missile1.x, missile1.y )
                     in
                     returnedCollage |> Expect.equal missileCollage
+            ]
+        ]
+
+
+testUpdateFunctions : Test
+testUpdateFunctions =
+    describe "Update functions"
+        [ describe "Update"
+            [ describe "KeyDown"
+                [ test "Pressing Space start a game when state is Start or GameOver" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyDown Space) initialModel
+                        in
+                        model |> Expect.equal { initialModel | state = Play }
+                , test "Pressing Space shoot a missile when state is Play" <|
+                    \_ ->
+                        let
+                            ( model, _ ) =
+                                update (KeyDown Space) updatedModel
+
+                            newMissile =
+                                Missile tankLeft.x tankY
+
+                            updatedGame =
+                                Game fullGame.tank fullGame.invaders (newMissile :: fullGame.missiles)
+                        in
+                        model |> Expect.equal { updatedModel | game = updatedGame }
+
+                -- , test "Pressing left move the tank to the left when state is Play"
+                -- , test "Pressing right move the tank to the right when state is Play"
+                , test "shootMissile add a new missile to the game" <|
+                    \_ ->
+                        let
+                            returnedGame =
+                                shootMissile initialGame
+
+                            newMissile =
+                                Missile initialGame.tank.x tankY
+                        in
+                        returnedGame |> Expect.equal { initialGame | missiles = newMissile :: initialGame.missiles }
+                ]
+
+            -- , describe "KeyUp" []
+            -- , describe "Tick" []
             ]
         ]
