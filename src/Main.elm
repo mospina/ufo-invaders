@@ -1,4 +1,4 @@
-module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, halfGameHeight, halfGameWidth, hitRange, init, initialGame, initialModel, initialTank, invaderHeight, invaderImage, invaderRate, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, main, missileHeight, missileImage, missileSpeed, missileWidth, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, view)
+module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, halfGameHeight, halfGameWidth, hitRange, init, initialGame, initialModel, initialTank, invaderHeight, invaderImage, invaderRate, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, main, missileHeight, missileImage, missileSpeed, missileWidth, onTick, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, updateInvaders, updateMissile, updateMissiles, updateTank, view)
 
 import Browser
 import Browser.Events as Events
@@ -439,7 +439,54 @@ keyUp key model =
 
 onTick : Float -> Model -> Model
 onTick tick model =
-    initialModel
+    { model | game = updateGame model.game tick }
+
+
+updateGame : Game -> Float -> Game
+updateGame game tick =
+    { game
+        | tank = updateTank game.tank
+        , invaders = updateInvaders game.invaders game.missiles
+        , missiles = updateMissiles game.missiles game.invaders
+    }
+
+
+updateTank : Tank -> Tank
+updateTank tank =
+    { tank | x = tank.x + (tankSpeed * tank.dir) }
+
+
+
+-- update list of invaders: position of invaders, filter them if they were hit, add new invaders
+
+
+updateInvaders : List Invader -> List Missile -> List Invader
+updateInvaders invaders missiles =
+    invaders
+
+
+updateMissiles : List Missile -> List Invader -> List Missile
+updateMissiles missiles invaders =
+    case missiles of
+        [] ->
+            []
+
+        first :: rest ->
+            if missileCollide first invaders then
+                updateMissiles rest invaders
+
+            else
+                updateMissile first :: updateMissiles rest invaders
+
+
+updateMissile : Missile -> Missile
+updateMissile missile =
+    { missile | y = missile.y + missileSpeed }
+
+
+missileCollide : Missile -> List Invader -> Bool
+missileCollide missile invaders =
+    False
 
 
 shootMissile : Game -> Game

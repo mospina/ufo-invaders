@@ -326,7 +326,65 @@ testUpdateFunctions =
                         in
                         model |> Expect.equal expectedModel
                 ]
+            , describe "Tick"
+                [ test "onTick updates the game physics" <|
+                    \_ ->
+                        let
+                            model =
+                                onTick 1 updatedModel
 
-            -- , describe "Tick" []
+                            updatedTank =
+                                { tankLeft | x = tankLeft.x + (tankSpeed * tankLeft.dir) }
+
+                            updatedInvaders =
+                                List.map
+                                    (\i ->
+                                        { i
+                                            | y = i.y - invaderYspeed
+                                            , x = i.x + (invaderXspeed * i.speedX)
+                                        }
+                                    )
+                                    [ invader2, invader3 ]
+
+                            updatedMissiles =
+                                List.map (\m -> { m | y = m.y + missileSpeed }) [ missile1, missile3 ]
+
+                            updatedFullGame =
+                                Game updatedTank updatedInvaders updatedMissiles
+
+                            expectedModel =
+                                { updatedModel | game = updatedFullGame }
+                        in
+                        model |> Expect.equal expectedModel
+                , test "updateTank updates the position of the tank" <|
+                    \_ ->
+                        let
+                            tank =
+                                updateTank tankRigth
+
+                            updatedTank =
+                                { tankRigth | x = tankRigth.x + (tankSpeed * tankRigth.dir) }
+                        in
+                        tank |> Expect.equal updatedTank
+
+                --, test "updateTank stop the thank if tank is in the left or right border" <|
+                , test "updateMissiles update the position of the missiles and filter them on collision" <|
+                    \_ ->
+                        let
+                            missiles =
+                                updateMissiles listOfMissiles listOfInvaders
+
+                            updatedMissiles =
+                                List.map (\m -> { m | y = m.y + missileSpeed }) [ missile1, missile3 ]
+                        in
+                        missiles |> Expect.equal updatedMissiles
+                , test "updateMissile update the position of a missile" <|
+                    \_ ->
+                        let
+                            missile =
+                                updateMissile missile1
+                        in
+                        missile |> Expect.equal { missile1 | y = missile1.y + missileSpeed }
+                ]
             ]
         ]
