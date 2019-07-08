@@ -1,10 +1,11 @@
-module Example exposing (testInit, testRenderFunctions, testUpdateFunctions)
+module Example exposing (testGenerateInvader, testInit, testRenderFunctions, testUpdateFunctions)
 
 import Collage exposing (group, image, shift)
 import Collage.Render exposing (svgBox)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Main exposing (..)
+import Random
 import Test exposing (..)
 
 
@@ -25,15 +26,15 @@ tankRigth =
 
 
 invader1 =
-    Invader 0 0 3
+    Invader 0 0 0
 
 
 invader2 =
-    Invader (halfGameWidth / 2) (halfGameHeight / 2) -3
+    Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
 
 
 invader3 =
-    Invader (0 - halfGameWidth) (0 - halfGameHeight) 3
+    Invader (0 - halfGameWidth) (0 - halfGameHeight) 1
 
 
 emptyListOfInvaders =
@@ -340,8 +341,8 @@ testUpdateFunctions =
                                 List.map
                                     (\i ->
                                         { i
-                                            | y = i.y - invaderYspeed
-                                            , x = i.x + (invaderXspeed * i.speedX)
+                                            | y = i.y + invaderYspeed
+                                            , x = i.x + (invaderXspeed * i.dir)
                                         }
                                     )
                                     [ invader2, invader3 ]
@@ -356,6 +357,8 @@ testUpdateFunctions =
                                 { updatedModel | game = updatedFullGame }
                         in
                         model |> Expect.equal expectedModel
+                , test "onTick doesn't updates the game when status is Play" <|
+                    \_ -> onTick 1 initialModel |> Expect.equal initialModel
                 , test "updateTank updates the position of the tank" <|
                     \_ ->
                         let
@@ -385,6 +388,86 @@ testUpdateFunctions =
                                 updateMissile missile1
                         in
                         missile |> Expect.equal { missile1 | y = missile1.y + missileSpeed }
+                , test "updateInvaders updates the position of the invaders and filter them on collision" <|
+                    \_ ->
+                        let
+                            invaders =
+                                updateInvaders listOfInvaders listOfMissiles
+
+                            updatedInvaders =
+                                List.map
+                                    (\i ->
+                                        { i
+                                            | y = i.y + invaderYspeed
+                                            , x = i.x + (i.dir * invaderXspeed)
+                                        }
+                                    )
+                                    [ invader2, invader3 ]
+                        in
+                        invaders |> Expect.equal updatedInvaders
+                , test "updateInvader update the position of a invader" <|
+                    \_ ->
+                        let
+                            invader =
+                                updateInvader invader2
+                        in
+                        invader
+                            |> Expect.equal
+                                { invader2
+                                    | y = invader2.y + invaderYspeed
+                                    , x = invader2.x + (invaderXspeed * invader2.dir)
+                                }
+
+                --, test "updateInvader change direction if it gets to the left border" <|
+                --, test "updateInvader change direction if it gets to the right border" <|
+                --, test "the game end if an invader reach the buttom" <|
+                ]
+            , describe "Invade"
+                [ test "invade add a new Invader to the game" <|
+                    \_ ->
+                        let
+                            newInvader =
+                                Invader 0 -halfGameHeight -1
+
+                            game =
+                                onInvade fullGame (Just newInvader)
+
+                            updatedGame =
+                                { fullGame | invaders = newInvader :: fullGame.invaders }
+                        in
+                        game |> Expect.equal updatedGame
+                , test "invade doesn't do anything when maybe is Nothing" <|
+                    \_ -> onInvade fullGame Nothing |> Expect.equal fullGame
                 ]
             ]
+        ]
+
+
+testGenerateInvader : Test
+testGenerateInvader =
+    let
+        seed =
+            Random.initialSeed 12345
+
+        ( maybeInvader, _ ) =
+            Random.step generateInvader seed
+    in
+    describe "generateInvader"
+        [ test "Generated invader has the right y coordinate" <|
+            \_ ->
+                case maybeInvader of
+                    Just invader ->
+                        invader.y |> Expect.equal halfGameHeight
+
+                    Nothing ->
+                        Expect.pass
+        , test "Generated invader has the right x coordinate" <|
+            \_ ->
+                case maybeInvader of
+                    Just invader ->
+                        Expect.true "x is not in the range"
+                            (invader.x >= -halfGameWidth && invader.x <= halfGameWidth)
+
+                    Nothing ->
+                        Expect.pass
         ]

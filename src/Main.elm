@@ -1,4 +1,4 @@
-module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, halfGameHeight, halfGameWidth, hitRange, init, initialGame, initialModel, initialTank, invaderHeight, invaderImage, invaderRate, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, main, missileHeight, missileImage, missileSpeed, missileWidth, onTick, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, updateInvaders, updateMissile, updateMissiles, updateTank, view)
+module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, generateInvader, halfGameHeight, halfGameWidth, init, initialGame, initialModel, initialTank, invaderHeight, invaderImage, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, keyDown, keyUp, main, missileCollide, missileHeight, missileImage, missileSpeed, missileWidth, onInvade, onTick, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, updateGame, updateInvader, updateInvaders, updateMissile, updateMissiles, updateTank, updateTankDirection, view)
 
 import Browser
 import Browser.Events as Events
@@ -6,6 +6,7 @@ import Collage exposing (Collage, group, image, shift)
 import Collage.Render exposing (svgBox)
 import Html exposing (..)
 import Json.Decode as Decode
+import Random exposing (Generator)
 
 
 
@@ -96,20 +97,11 @@ invaderImage =
 
 
 invaderXspeed =
-    -- I may don't need this one
     1.5
 
 
 invaderYspeed =
-    1.5
-
-
-invaderRate =
-    100
-
-
-hitRange =
-    10
+    -1.5
 
 
 
@@ -150,24 +142,25 @@ initialTank =
 type alias Invader =
     { x : Float
     , y : Float
-    , speedX : Float
+    , dir : Float
     }
 
 
 
 {-
-   -- Invader is: Invader x y
+   -- Invader is: Invader x y dir
    -- interp. a invader at position x y,
-              and speedX per clock tick along x axis (negative number left, positive number right)
-            NOTE: the starter file declares dx: the invader along x by dx pixels per clock tick
+              and direction dir[-1, 1] (left -1. right 1, straight 0)
+              Invader moves at speed (invaderXspeed * dir) pixels per clock-tick
+              on the X axis and invaderYspeed on the Y axis.
 
-   invader  = Invader 6 16 -3
+   invader  = Invader 6 16 -1 -- moving left
 
    fnForInvader : Invader -> ...
    fnForInvader invader =
      ... invader.x   -- number
          invader.y   -- number
-         invader.speedX -- number [-1,1]
+         invader.dir -- number [-1,1]
 
    -- Template rules used:
    --   - compound: 3 fields
@@ -178,7 +171,7 @@ type alias Invader =
    --   - Invader :: [Invader]
    -- interp. a list of Invader
    invader0 = []
-   invader1 = [Invader 10 20 3, Invader 20 20 -3]
+   invader1 = [Invader 10 20 1, Invader 20 20 -1]
 
    fnForListOfInvaders : [Invader] -> ...
    fnForListOfInvaders invaders =
@@ -347,7 +340,7 @@ type Msg
     = KeyDown Key
     | KeyUp Key
     | Tick Float
-    | NoOp
+    | Invade (Maybe Invader)
 
 
 
@@ -355,8 +348,10 @@ type Msg
        - KeyDown Key
        - KeyUp Key
        - Tick Float
-       - NoOp
-     interp. KeyDown and KeyUp are keyboard events. Tick is a time based event
+       - Invade (Maybe Invader)
+     interp. KeyDown and KeyUp are keyboard events.
+             Tick is a time based event
+             Invade is a command to add random invaders
      -- <examples are redundant for enumerations>
 
    fnForMsg : Msg -> ...
@@ -365,7 +360,7 @@ type Msg
        KeyDown key -> ... key
        KeyUp key -> ... key
        Tick x -> ... x
-       NoOp -> ...
+       Invade maybeInvader -> ...
 
    -- Template rules used:
    --  - one of: 4 cases
@@ -382,10 +377,20 @@ update msg model =
             ( keyUp key model, Cmd.none )
 
         Tick tick ->
-            ( onTick tick model, Cmd.none )
+            case model.state of
+                Play ->
+                    ( onTick tick model, Random.generate Invade generateInvader )
 
-        NoOp ->
-            ( model, Cmd.none )
+                _ ->
+                    ( model, Cmd.none )
+
+        Invade maybeInvader ->
+            case model.state of
+                Play ->
+                    ( { model | game = onInvade model.game maybeInvader }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 keyDown : Key -> Model -> Model
@@ -442,6 +447,16 @@ onTick tick model =
     { model | game = updateGame model.game tick }
 
 
+onInvade : Game -> Maybe Invader -> Game
+onInvade game maybeInvader =
+    case maybeInvader of
+        Just invader ->
+            { game | invaders = invader :: game.invaders }
+
+        Nothing ->
+            game
+
+
 updateGame : Game -> Float -> Game
 updateGame game tick =
     { game
@@ -456,13 +471,71 @@ updateTank tank =
     { tank | x = tank.x + (tankSpeed * tank.dir) }
 
 
-
--- update list of invaders: position of invaders, filter them if they were hit, add new invaders
+updateTankDirection : Game -> Float -> Game
+updateTankDirection game newDir =
+    let
+        updatedTank =
+            Tank game.tank.x newDir
+    in
+    { game | tank = updatedTank }
 
 
 updateInvaders : List Invader -> List Missile -> List Invader
 updateInvaders invaders missiles =
-    invaders
+    case invaders of
+        [] ->
+            []
+
+        first :: rest ->
+            if invaderCollide first missiles then
+                updateInvaders rest missiles
+
+            else
+                updateInvader first :: updateInvaders rest missiles
+
+
+invaderCollide : Invader -> List Missile -> Bool
+invaderCollide invader missiles =
+    False
+
+
+
+-- Return true if the invader is hit by a missile
+
+
+updateInvader : Invader -> Invader
+updateInvader invader =
+    { invader
+        | x = invader.x + (invader.dir * invaderXspeed)
+        , y = invader.y + invaderYspeed
+    }
+
+
+
+-- invader.dir = updateDirection
+
+
+generateInvader : Generator (Maybe Invader)
+generateInvader =
+    let
+        randomX =
+            Random.float -halfGameWidth halfGameWidth
+
+        randomDir =
+            Random.float -1 1
+
+        invadeOrNot =
+            Random.weighted ( 1, True ) [ ( 99, False ) ]
+
+        maybeInvader bool x dir =
+            case bool of
+                True ->
+                    Just (Invader x halfGameHeight dir)
+
+                False ->
+                    Nothing
+    in
+    Random.map3 maybeInvader invadeOrNot randomX randomDir
 
 
 updateMissiles : List Missile -> List Invader -> List Missile
@@ -496,15 +569,6 @@ shootMissile game =
             Missile game.tank.x tankY
     in
     { game | missiles = newMissile :: game.missiles }
-
-
-updateTankDirection : Game -> Float -> Game
-updateTankDirection game newDir =
-    let
-        updatedTank =
-            Tank game.tank.x newDir
-    in
-    { game | tank = updatedTank }
 
 
 
