@@ -18,11 +18,11 @@ tankCenter =
 
 
 tankLeft =
-    Tank (0 - (gameWidth / 2)) -1
+    Tank (-halfGameWidth / 2) -1
 
 
 tankRigth =
-    Tank (gameWidth / 2) 1
+    Tank (halfGameWidth / 2) 1
 
 
 invader1 =
@@ -369,8 +369,32 @@ testUpdateFunctions =
                                 { tankRigth | x = tankRigth.x + (tankSpeed * tankRigth.dir) }
                         in
                         tank |> Expect.equal updatedTank
+                , test "updateTank stop the thank if tank is in the right border" <|
+                    \_ ->
+                        let
+                            tank =
+                                Tank halfGameWidth 1
 
-                --, test "updateTank stop the thank if tank is in the left or right border" <|
+                            updatedTank =
+                                updateTank tank
+
+                            expectedTank =
+                                { tank | x = tank.x }
+                        in
+                        updatedTank |> Expect.equal expectedTank
+                , test "updateTank stop the thank if tank is in the left border" <|
+                    \_ ->
+                        let
+                            tank =
+                                Tank -halfGameWidth -1
+
+                            updatedTank =
+                                updateTank tank
+
+                            expectedTank =
+                                { tank | x = tank.x }
+                        in
+                        updatedTank |> Expect.equal expectedTank
                 , test "updateMissiles update the position of the missiles and filter them on collision" <|
                     \_ ->
                         let
@@ -417,9 +441,41 @@ testUpdateFunctions =
                                     | y = invader2.y + invaderYspeed
                                     , x = invader2.x + (invaderXspeed * invader2.dir)
                                 }
+                , test "updateInvader change direction if it gets to the left border" <|
+                    \_ ->
+                        let
+                            invader =
+                                Invader -halfGameWidth 0 -1
 
-                --, test "updateInvader change direction if it gets to the left border" <|
-                --, test "updateInvader change direction if it gets to the right border" <|
+                            updatedInvader =
+                                updateInvader invader
+
+                            expectedInvader =
+                                { invader
+                                    | dir = 1
+                                    , x = invader.x + (invader.dir * invaderXspeed)
+                                    , y = invader.y + invaderYspeed
+                                }
+                        in
+                        updatedInvader |> Expect.equal expectedInvader
+                , test "updateInvader change direction if it gets to the right border" <|
+                    \_ ->
+                        let
+                            invader =
+                                Invader halfGameWidth 0 1
+
+                            updatedInvader =
+                                updateInvader invader
+
+                            expectedInvader =
+                                { invader
+                                    | dir = -1
+                                    , x = invader.x + (invader.dir * invaderXspeed)
+                                    , y = invader.y + invaderYspeed
+                                }
+                        in
+                        updatedInvader |> Expect.equal expectedInvader
+
                 --, test "the game end if an invader reach the buttom" <|
                 ]
             , describe "Invade"

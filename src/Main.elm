@@ -468,7 +468,11 @@ updateGame game tick =
 
 updateTank : Tank -> Tank
 updateTank tank =
-    { tank | x = tank.x + (tankSpeed * tank.dir) }
+    if tank.x > -halfGameWidth && tank.x < halfGameWidth then
+        { tank | x = tank.x + (tankSpeed * tank.dir) }
+
+    else
+        tank
 
 
 updateTankDirection : Game -> Float -> Game
@@ -508,11 +512,17 @@ updateInvader invader =
     { invader
         | x = invader.x + (invader.dir * invaderXspeed)
         , y = invader.y + invaderYspeed
+        , dir = updateInvaderDir invader
     }
 
 
+updateInvaderDir : Invader -> Float
+updateInvaderDir invader =
+    if invader.x <= -halfGameWidth || invader.x >= halfGameWidth then
+        invader.dir * -1
 
--- invader.dir = updateDirection
+    else
+        invader.dir
 
 
 generateInvader : Generator (Maybe Invader)
