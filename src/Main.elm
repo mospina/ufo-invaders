@@ -503,7 +503,16 @@ updateInvaders invaders missiles =
 
 invaderCollide : Invader -> List Missile -> Bool
 invaderCollide invader missiles =
-    False
+    case missiles of
+        [] ->
+            False
+
+        first :: rest ->
+            if hit first invader then
+                True
+
+            else
+                invaderCollide invader rest
 
 
 
@@ -575,7 +584,16 @@ updateMissile missile =
 
 missileCollide : Missile -> List Invader -> Bool
 missileCollide missile invaders =
-    False
+    case invaders of
+        [] ->
+            False
+
+        first :: rest ->
+            if hit missile first then
+                True
+
+            else
+                missileCollide missile rest
 
 
 shootMissile : Game -> Game
@@ -587,60 +605,32 @@ shootMissile game =
     { game | missiles = newMissile :: game.missiles }
 
 
+hit : Missile -> Invader -> Bool
+hit missile invader =
+    let
+        halfInvaderWidth =
+            invaderWidth / 2
 
-{--detectCollision filters out missiles and invaders that hit each other
-    
-    +--------------------------------------------------+
-    | missile    |                  |                  |
-    | invaders   | empty            | [missiles]       |
-    +------------|------------------|------------------+
-    | empty      | ([], [])         | ([missiles], []) |
-    |------------|------------------|------------------|
-    | [invaders] | ([], [invaders]) | Filter out       |
-    +--------------------------------------------------+  
+        halfInvaderHeight =
+            invaderHeight / 2
+    in
+    if
+        missile.x
+            >= (invader.x - halfInvaderWidth)
+            && missile.x
+            <= (invader.x + halfInvaderWidth)
+            && missile.y
+            >= (invader.y - halfInvaderHeight)
+            && missile.y
+            <= (invader.y + halfInvaderHeight)
+    then
+        True
 
-   fnForListOfMissiles : List Missile -> ...
-   fnForListOfMissiles missiles =
-     case missiles of
-       [] -> []
-       (first:rest) -> (fnForMissile first) :: (fnForListOfMissiles rest)
+    else
+        False
 
-   fnForListOfInvaders : List Invader -> ...
-   fnForListOfInvaders invaders =
-     case invaders of
-       [] -> []
-       first::rest -> (fnForInvader first) :: (fnForListOfInvaders rest)
---
 
-detectCollision : List Missile -> List Invader -> ( List Missile, List Invader )
-detectCollision missiles invaders =
-    case missiles of
-        [] ->
-            ( missiles, invaders )
 
-        firstMissile :: restOfMissiles ->
-            case invaders of
-                [] ->
-                    ( missiles, invaders )
-
-                _ ->
-                    let
-                        ( missile, restOfInvaders ) =
-                            detectMissileHit firstMissile invaders
-                    in
-                    case missile of
-                        Just m ->
-                            ( m :: detectCollision restOfMissiles restOfInvaders
-                            , restOfInvaders
-                            )
-
-                        Nothing ->
-                            ( detectCollision restOfMissiles restOfInvaders, restOfInvaders )
-
-detectMissileHit : Missile -> List Invader -> ( Maybe Missile, List Invader )
-detectMissileHit missile invaders =
-    ( Just missile, invaders )
---}
 -- SUBSCRIPTIONS
 
 
