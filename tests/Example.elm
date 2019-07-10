@@ -527,3 +527,13 @@ testGenerateInvader =
                     Nothing ->
                         Expect.pass
         ]
+
+
+testDetectCollision : Test
+testDetectCollision =
+    describe "detectCollision"
+        [-- test "When first missile and first invader collide"
+         -- test "When last missile and first invader collide"
+         -- test "When second missile and third invader collide"
+         -- test "When first missile and last invader collide"
+        ]

@@ -518,7 +518,10 @@ updateInvader invader =
 
 updateInvaderDir : Invader -> Float
 updateInvaderDir invader =
-    if invader.x <= -halfGameWidth || invader.x >= halfGameWidth then
+    if invader.x <= -halfGameWidth && invader.dir < 0 then
+        invader.dir * -1
+
+    else if invader.x >= halfGameWidth && invader.dir > 0 then
         invader.dir * -1
 
     else
@@ -579,6 +582,26 @@ shootMissile game =
             Missile game.tank.x tankY
     in
     { game | missiles = newMissile :: game.missiles }
+
+
+
+{--detectCollision filters out missiles and invaders that hit each other
+    
+    +--------------------------------------------------+
+    | missile    |                  |                  |
+    | invaders   | empty            | [missiles]       |
+    +------------|------------------|------------------+
+    | empty      | ([], [])         | ([missiles], []) |
+    |------------|------------------|------------------|
+    | [invaders] | ([], [invaders]) | Filter out       |
+    +--------------------------------------------------+  
+
+--}
+
+
+detectCollision : List Missile -> List Invader -> ( List Missile, List Invader )
+detectCollision missiles invaders =
+    ( missiles, invaders )
 
 
 
