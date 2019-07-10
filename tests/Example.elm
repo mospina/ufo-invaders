@@ -529,11 +529,95 @@ testGenerateInvader =
         ]
 
 
+
+{--
 testDetectCollision : Test
 testDetectCollision =
     describe "detectCollision"
-        [-- test "When first missile and first invader collide"
-         -- test "When last missile and first invader collide"
-         -- test "When second missile and third invader collide"
-         -- test "When first missile and last invader collide"
+        [ test "When first missile and first invader collide" <|
+            \_ ->
+                let
+                    missiles =
+                        [ Missile 0 (invaderHeight / 3)
+                        , Missile (halfGameWidth - 10) 0
+                        , Missile 0 (halfGameHeight - 10)
+                        , Missile (halfGameWidth - 10) (halfGameHeight - 10)
+                        ]
+
+                    invaders =
+                        [ Invader 0 0 -1
+                        , Invader (halfGameWidth / 2) 0 1
+                        , Invader 0 (halfGameHeight / 2) 1
+                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
+                        ]
+                in
+                detectCollision missiles invaders
+                    |> Expect.equal ( List.drop 1 missiles, List.drop 1 invaders )
+        , test "When last missile and first invader collide" <|
+            \_ ->
+                let
+                    missiles =
+                        [ Missile (halfGameWidth - 10) 0
+                        , Missile 0 (halfGameHeight - 10)
+                        , Missile (halfGameWidth - 10) (halfGameHeight - 10)
+                        , Missile 0 (invaderHeight / 3)
+                        ]
+
+                    invaders =
+                        [ Invader 0 0 -1
+                        , Invader (halfGameWidth / 2) 0 1
+                        , Invader 0 (halfGameHeight / 2) 1
+                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
+                        ]
+                in
+                detectCollision missiles invaders
+                    |> Expect.equal ( List.take 3 missiles, List.drop 1 invaders )
+        , test "When first missile and last invader collide" <|
+            \_ ->
+                let
+                    missiles =
+                        [ Missile (halfGameWidth - 10) (halfGameHeight - 10)
+                        , Missile (halfGameWidth - 10) 0
+                        , Missile 0 (halfGameHeight - 10)
+                        , Missile 0 (invaderHeight / 3)
+                        ]
+
+                    invaders =
+                        [ Invader (halfGameWidth / 2) 0 1
+                        , Invader 0 (halfGameHeight / 2) 1
+                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
+                        , Invader 0 0 -1
+                        ]
+                in
+                detectCollision missiles invaders
+                    |> Expect.equal ( List.drop 1 missiles, List.take 3 invaders )
+        , test "When second missile and third invader collide" <|
+            \_ ->
+                let
+                    missiles =
+                        [ Missile (halfGameWidth - 10) 0
+                        , Missile (halfGameWidth - 10) (halfGameHeight - 10)
+                        , Missile 0 (halfGameHeight - 10)
+                        , Missile 0 (invaderHeight / 3)
+                        ]
+
+                    invaders =
+                        [ Invader (halfGameWidth / 2) 0 1
+                        , Invader 0 (halfGameHeight / 2) 1
+                        , Invader 0 0 -1
+                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
+                        ]
+                in
+                detectCollision missiles invaders
+                    |> Expect.equal
+                        ( [ Missile (halfGameWidth - 10) 0
+                          , Missile 0 (halfGameHeight - 10)
+                          , Missile 0 (invaderHeight / 3)
+                          ]
+                        , [ Invader (halfGameWidth / 2) 0 1
+                          , Invader 0 (halfGameHeight / 2) 1
+                          , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
+                          ]
+                        )
         ]
+--}

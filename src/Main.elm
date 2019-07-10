@@ -1,4 +1,4 @@
-module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, generateInvader, halfGameHeight, halfGameWidth, init, initialGame, initialModel, initialTank, invaderHeight, invaderImage, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, keyDown, keyUp, main, missileCollide, missileHeight, missileImage, missileSpeed, missileWidth, onInvade, onTick, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, updateGame, updateInvader, updateInvaders, updateMissile, updateMissiles, updateTank, updateTankDirection, view)
+module Main exposing (Game, Invader, Key(..), Missile, Model, Msg(..), State(..), Tank, assetsDir, fromCode, gameHeight, gameWidth, generateInvader, halfGameHeight, halfGameWidth, init, initialGame, initialModel, initialTank, invaderCollide, invaderHeight, invaderImage, invaderWidth, invaderXspeed, invaderYspeed, keyDecoder, keyDown, keyUp, main, missileCollide, missileHeight, missileImage, missileSpeed, missileWidth, onInvade, onTick, render, renderInvader, renderListOfInvaders, renderListOfMissiles, renderMissile, renderTank, shootMissile, subscriptions, tankHeight, tankImage, tankSpeed, tankWidth, tankY, update, updateGame, updateInvader, updateInvaderDir, updateInvaders, updateMissile, updateMissiles, updateTank, updateTankDirection, view)
 
 import Browser
 import Browser.Events as Events
@@ -173,7 +173,7 @@ type alias Invader =
    invader0 = []
    invader1 = [Invader 10 20 1, Invader 20 20 -1]
 
-   fnForListOfInvaders : [Invader] -> ...
+   fnForListOfInvaders : List Invader -> ...
    fnForListOfInvaders invaders =
      case invaders of
        [] -> []
@@ -217,7 +217,7 @@ type alias Missile =
    missile0 = []
    missile1 = [Missile 10 20, Missile 20 20]
 
-   fnForListOfMissiles : [Missile] -> ...
+   fnForListOfMissiles : List Missile -> ...
    fnForListOfMissiles missiles =
      case missiles of
        [] -> []
@@ -599,15 +599,48 @@ shootMissile game =
     | [invaders] | ([], [invaders]) | Filter out       |
     +--------------------------------------------------+  
 
---}
+   fnForListOfMissiles : List Missile -> ...
+   fnForListOfMissiles missiles =
+     case missiles of
+       [] -> []
+       (first:rest) -> (fnForMissile first) :: (fnForListOfMissiles rest)
 
+   fnForListOfInvaders : List Invader -> ...
+   fnForListOfInvaders invaders =
+     case invaders of
+       [] -> []
+       first::rest -> (fnForInvader first) :: (fnForListOfInvaders rest)
+--
 
 detectCollision : List Missile -> List Invader -> ( List Missile, List Invader )
 detectCollision missiles invaders =
-    ( missiles, invaders )
+    case missiles of
+        [] ->
+            ( missiles, invaders )
 
+        firstMissile :: restOfMissiles ->
+            case invaders of
+                [] ->
+                    ( missiles, invaders )
 
+                _ ->
+                    let
+                        ( missile, restOfInvaders ) =
+                            detectMissileHit firstMissile invaders
+                    in
+                    case missile of
+                        Just m ->
+                            ( m :: detectCollision restOfMissiles restOfInvaders
+                            , restOfInvaders
+                            )
 
+                        Nothing ->
+                            ( detectCollision restOfMissiles restOfInvaders, restOfInvaders )
+
+detectMissileHit : Missile -> List Invader -> ( Maybe Missile, List Invader )
+detectMissileHit missile invaders =
+    ( Just missile, invaders )
+--}
 -- SUBSCRIPTIONS
 
 
