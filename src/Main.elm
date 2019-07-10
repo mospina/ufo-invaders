@@ -468,11 +468,14 @@ updateGame game tick =
 
 updateTank : Tank -> Tank
 updateTank tank =
-    if tank.x > -halfGameWidth && tank.x < halfGameWidth then
-        { tank | x = tank.x + (tankSpeed * tank.dir) }
+    if tank.x <= -halfGameWidth && tank.dir < 0 then
+        tank
+
+    else if tank.x >= halfGameWidth && tank.dir > 0 then
+        tank
 
     else
-        tank
+        { tank | x = tank.x + (tankSpeed * tank.dir) }
 
 
 updateTankDirection : Game -> Float -> Game
