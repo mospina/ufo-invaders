@@ -34,7 +34,7 @@ invader2 =
 
 
 invader3 =
-    Invader (0 - halfGameWidth) (0 - halfGameHeight) 1
+    Invader (-halfGameWidth / 2) (-halfGameHeight / 2) 1
 
 
 emptyListOfInvaders =
@@ -357,8 +357,18 @@ testUpdateFunctions =
                                 { updatedModel | game = updatedFullGame }
                         in
                         model |> Expect.equal expectedModel
-                , test "onTick doesn't updates the game when status is Play" <|
-                    \_ -> onTick 1 initialModel |> Expect.equal initialModel
+                , test "update doesn't updates the game when status is Play" <|
+                    \_ -> update (Tick 1) initialModel |> Expect.equal ( initialModel, Cmd.none )
+                , test "the game end if an invader reach the bottom" <|
+                    \_ ->
+                        let
+                            model =
+                                Model Play <| Game tankLeft [ Invader 0 -halfGameHeight -1 ] listOfMissiles
+
+                            returnedModel =
+                                onTick 1 model
+                        in
+                        returnedModel.state |> Expect.equal GameOver
                 , test "updateTank updates the position of the tank" <|
                     \_ ->
                         let
@@ -475,8 +485,6 @@ testUpdateFunctions =
                                 }
                         in
                         updatedInvader |> Expect.equal expectedInvader
-
-                --, test "the game end if an invader reach the buttom" <|
                 ]
             , describe "Invade"
                 [ test "invade add a new Invader to the game" <|
@@ -527,97 +535,3 @@ testGenerateInvader =
                     Nothing ->
                         Expect.pass
         ]
-
-
-
-{--
-testDetectCollision : Test
-testDetectCollision =
-    describe "detectCollision"
-        [ test "When first missile and first invader collide" <|
-            \_ ->
-                let
-                    missiles =
-                        [ Missile 0 (invaderHeight / 3)
-                        , Missile (halfGameWidth - 10) 0
-                        , Missile 0 (halfGameHeight - 10)
-                        , Missile (halfGameWidth - 10) (halfGameHeight - 10)
-                        ]
-
-                    invaders =
-                        [ Invader 0 0 -1
-                        , Invader (halfGameWidth / 2) 0 1
-                        , Invader 0 (halfGameHeight / 2) 1
-                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
-                        ]
-                in
-                detectCollision missiles invaders
-                    |> Expect.equal ( List.drop 1 missiles, List.drop 1 invaders )
-        , test "When last missile and first invader collide" <|
-            \_ ->
-                let
-                    missiles =
-                        [ Missile (halfGameWidth - 10) 0
-                        , Missile 0 (halfGameHeight - 10)
-                        , Missile (halfGameWidth - 10) (halfGameHeight - 10)
-                        , Missile 0 (invaderHeight / 3)
-                        ]
-
-                    invaders =
-                        [ Invader 0 0 -1
-                        , Invader (halfGameWidth / 2) 0 1
-                        , Invader 0 (halfGameHeight / 2) 1
-                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
-                        ]
-                in
-                detectCollision missiles invaders
-                    |> Expect.equal ( List.take 3 missiles, List.drop 1 invaders )
-        , test "When first missile and last invader collide" <|
-            \_ ->
-                let
-                    missiles =
-                        [ Missile (halfGameWidth - 10) (halfGameHeight - 10)
-                        , Missile (halfGameWidth - 10) 0
-                        , Missile 0 (halfGameHeight - 10)
-                        , Missile 0 (invaderHeight / 3)
-                        ]
-
-                    invaders =
-                        [ Invader (halfGameWidth / 2) 0 1
-                        , Invader 0 (halfGameHeight / 2) 1
-                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
-                        , Invader 0 0 -1
-                        ]
-                in
-                detectCollision missiles invaders
-                    |> Expect.equal ( List.drop 1 missiles, List.take 3 invaders )
-        , test "When second missile and third invader collide" <|
-            \_ ->
-                let
-                    missiles =
-                        [ Missile (halfGameWidth - 10) 0
-                        , Missile (halfGameWidth - 10) (halfGameHeight - 10)
-                        , Missile 0 (halfGameHeight - 10)
-                        , Missile 0 (invaderHeight / 3)
-                        ]
-
-                    invaders =
-                        [ Invader (halfGameWidth / 2) 0 1
-                        , Invader 0 (halfGameHeight / 2) 1
-                        , Invader 0 0 -1
-                        , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
-                        ]
-                in
-                detectCollision missiles invaders
-                    |> Expect.equal
-                        ( [ Missile (halfGameWidth - 10) 0
-                          , Missile 0 (halfGameHeight - 10)
-                          , Missile 0 (invaderHeight / 3)
-                          ]
-                        , [ Invader (halfGameWidth / 2) 0 1
-                          , Invader 0 (halfGameHeight / 2) 1
-                          , Invader (halfGameWidth / 2) (halfGameHeight / 2) -1
-                          ]
-                        )
-        ]
---}

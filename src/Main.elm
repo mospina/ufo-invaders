@@ -397,11 +397,11 @@ keyDown : Key -> Model -> Model
 keyDown key model =
     case key of
         Space ->
-            if model.state == Start then
-                { model | state = Play }
+            if model.state == Play then
+                { model | game = shootMissile model.game }
 
             else
-                { model | game = shootMissile model.game }
+                { model | state = Play }
 
         ArrowLeft ->
             if model.state == Play then
@@ -444,7 +444,33 @@ keyUp key model =
 
 onTick : Float -> Model -> Model
 onTick tick model =
-    { model | game = updateGame model.game tick }
+    { model
+        | game = updateGame model.game tick
+        , state = checkState model.game
+    }
+
+
+checkState : Game -> State
+checkState game =
+    if invasionCompleted game.invaders then
+        GameOver
+
+    else
+        Play
+
+
+invasionCompleted : List Invader -> Bool
+invasionCompleted invaders =
+    case invaders of
+        [] ->
+            False
+
+        first :: rest ->
+            if first.y <= -halfGameHeight then
+                True
+
+            else
+                invasionCompleted rest
 
 
 onInvade : Game -> Maybe Invader -> Game
