@@ -25,7 +25,6 @@ main =
 
 -- MODEL
 -- Constants:
--- speed values (not velocities) are given in pixels per tick
 
 
 gameWidth =
@@ -131,8 +130,8 @@ initialTank =
 
    fnForTank : Tank -> ...
    fnForTank tank =
-     ... tank.x    -- number
-     ... tank.dir  -- number
+     ... tank.x    -- Float
+     ... tank.dir  -- Float
 
    -- Template rules used:
    --   - compound: 2 fields
@@ -148,43 +147,45 @@ type alias Invader =
 
 
 {-
-   -- Invader is: Invader x y dir
-   -- interp. a invader at position x y,
-              and direction dir[-1, 1] (left -1. right 1, straight 0)
-              Invader moves at speed (invaderXspeed * dir) pixels per clock-tick
-              on the X axis and invaderYspeed on the Y axis.
+      -- Invader is: Invader x y dir
+      -- interp. a invader at position x y,
+                 and direction dir[-1, 1] (left -1. right 1, straight 0)
+                 Invader moves at speed (invaderXspeed * dir) pixels per clock-tick
+                 on the X axis and invaderYspeed on the Y axis.
 
-   invader  = Invader 6 16 -1 -- moving left
+      invader  = Invader 6 16 -1 -- moving left
 
-   fnForInvader : Invader -> ...
-   fnForInvader invader =
-     ... invader.x   -- number
-         invader.y   -- number
-         invader.dir -- number [-1,1]
+      fnForInvader : Invader -> ...
+      fnForInvader invader =
+        ... invader.x   -- float
+            invader.y   -- float
+            invader.dir -- float [-1,1]
 
-   -- Template rules used:
-   --   - compound: 3 fields
--}
-{-
-   -- [Invader] is one of:
-   --   - []
-   --   - Invader :: [Invader]
-   -- interp. a list of Invader
-   invader0 = []
-   invader1 = [Invader 10 20 1, Invader 20 20 -1]
+      -- Template rules used:
+      --   - compound: 3 fields
 
-   fnForListOfInvaders : List Invader -> ...
-   fnForListOfInvaders invaders =
-     case invaders of
-       [] -> []
-       first::rest -> (fnForInvader first) :: (fnForListOfInvaders rest)
+   ----------------------------------------------
 
-   -- Template rules used:
-   --   - one of: 2 cases
-   --   - atomic distinct: empty
-   --   - compound: Invader :: ListOfInvader
-   --   - reference: first is Invader
-   --   - self-reference: rest is [Invader]
+      -- [Invader] is one of:
+      --   - []
+      --   - Invader :: [Invader]
+      -- interp. a list of Invader
+
+      invader0 = []
+      invader1 = [Invader 10 20 1, Invader 20 20 -1]
+
+      fnForListOfInvaders : List Invader -> ...
+      fnForListOfInvaders invaders =
+        case invaders of
+          [] -> []
+          first::rest -> (fnForInvader first) :: (fnForListOfInvaders rest)
+
+      -- Template rules used:
+      --   - one of: 2 cases
+      --   - atomic distinct: empty
+      --   - compound: Invader :: ListOfInvader
+      --   - reference: first is Invader
+      --   - self-reference: rest is [Invader]
 -}
 
 
@@ -196,39 +197,41 @@ type alias Missile =
 
 
 {-
-   -- Missile is: Missile x y
-   -- interp. a missile at position x y
+      -- Missile is: Missile x y
+      -- interp. a missile at position x y
 
-   missile  = Missile 6 16
+      missile  = Missile 6 16
 
-   fnForMissile : Missile -> ...
-   fnForMissile missile =
-     ... missile.x  -- number
-         missile.y  -- number
+      fnForMissile : Missile -> ...
+      fnForMissile missile =
+        ... missile.x  -- float
+            missile.y  -- float
 
-   -- Template rules used:
-   --   - compound: 2 fields
--}
-{-
-   -- [Missile] is one of:
-   --   - []
-   --   - Missile :: [Missile]
-   -- interp. a list of Missile
-   missile0 = []
-   missile1 = [Missile 10 20, Missile 20 20]
+      -- Template rules used:
+      --   - compound: 2 fields
 
-   fnForListOfMissiles : List Missile -> ...
-   fnForListOfMissiles missiles =
-     case missiles of
-       [] -> []
-       (first:rest) -> (fnForMissile first) :: (fnForListOfMissiles rest)
+   ----------------------------------------------
 
-   -- Template rules used:
-   --   - one of: 2 cases
-   --   - atomic distinct: empty
-   --   - compound: Missile :: ListOfMissile
-   --   - reference: first is Missile
-   --   - self-reference: rest is [Missile]
+      -- [Missile] is one of:
+      --   - []
+      --   - Missile :: [Missile]
+      -- interp. a list of Missile
+
+      missile0 = []
+      missile1 = [Missile 10 20, Missile 20 20]
+
+      fnForListOfMissiles : List Missile -> ...
+      fnForListOfMissiles missiles =
+        case missiles of
+          [] -> []
+          (first:rest) -> (fnForMissile first) :: (fnForListOfMissiles rest)
+
+      -- Template rules used:
+      --   - one of: 2 cases
+      --   - atomic distinct: empty
+      --   - compound: Missile :: ListOfMissile
+      --   - reference: first is Missile
+      --   - self-reference: rest is [Missile]
 -}
 
 
@@ -253,7 +256,7 @@ initialGame =
 
    fnForGame : Game -> ...
    fnForGame game =
-     ... fnForTank game.tank      -- number
+     ... fnForTank game.tank                -- Tank
          fnForListOfInvaders game.invaders  -- listOfInvaders
          fnForListOfMissiles game.missiles  -- listOfMissiles
 
@@ -278,14 +281,15 @@ type State
        - Play
        - GameOver
      interp. the state of the curent game
+
      -- <examples are redundant for enumerations>
 
    fnForState : State -> ...
    fnForState state =
      case state of
-       Red -> ...
-       Yellow -> ...
-       Green -> ...
+       Start -> ...
+       Play -> ...
+       GameOver -> ...
 
    -- Template rules used:
    --  - one of: 3 cases
@@ -310,7 +314,7 @@ initialModel =
    -- Model is: Model State Game
    -- interp. a model with the state of the game and the game itself
 
-   model  = Model Start <| Game (Tank 8 0) [] []
+   model  = Model Start (Game (Tank 8 0) [] [])
 
    fnForModel : Model -> ...
    fnForModel model =
@@ -541,10 +545,6 @@ invaderCollide invader missiles =
                 invaderCollide invader rest
 
 
-
--- Return true if the invader is hit by a missile
-
-
 updateInvader : Invader -> Invader
 updateInvader invader =
     { invader
@@ -674,6 +674,7 @@ type Key
        - ArrowRight
        - Unknown
      interp. Key is the code of the key pressed
+
      -- <examples are redundant for enumerations>
 
    fnForKey : Key -> ...
@@ -721,7 +722,6 @@ fromCode keyCode =
 
 
 -- VIEW
--- Render current state of the game in the screen according to the model
 
 
 view : Model -> Html Msg
