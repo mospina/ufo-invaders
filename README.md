@@ -1,24 +1,27 @@
-# Elm
+# Ufo Invaders
 
-## Start project
+A Space Invader like game developed in Elm.
+
+## Elm
+
+### Start project
 
 elm init
 
-## Set up testing
+### Set up testing
 
 npm install -g elm-test
 elm-test init
 
 To learn more about testing in elm: https://elmprogramming.com/easy-to-test.html
 
-## Development environment
+### Development environment
 
 elm reactor
 
-## Installing 3th party libs
+### Installing 3th party libs
 
 elm install timjs/elm-collage
-
 
 ## Images and assets
 
