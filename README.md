@@ -1,6 +1,8 @@
 # Ufo Invaders
 
-A Space Invader like game developed in Elm.
+A Space Invader like game developed in Elm. 
+
+[Play](https://mospina.github.io/ufo-invaders/)
 
 ## Elm
 
@@ -37,7 +39,12 @@ elm make src/Main.elm --output=main.js
   <script src="main.js"></script>
 </head>
 <body>
-  <script>var app = Elm.Main.init();</script>
+  <div id="elm-node"></div>
+  <script>
+    var app = Elm.Main.init({
+      node: document.getElementById("elm-node")
+    });
+  </script>
 </body>
 </html>
 ```
