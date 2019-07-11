@@ -23,6 +23,25 @@ elm reactor
 
 elm install timjs/elm-collage
 
+### Serving the app
+
+elm make src/Main.elm --output=main.js
+
+```html
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Main</title>
+  <link rel="stylesheet" href="whatever-you-want.css">
+  <script src="main.js"></script>
+</head>
+<body>
+  <script>var app = Elm.Main.init();</script>
+</body>
+</html>
+```
+
 ## Images and assets
 
 Images from https://opengameart.org/
