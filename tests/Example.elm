@@ -332,7 +332,7 @@ testUpdateFunctions =
                     \_ ->
                         let
                             model =
-                                onTick 1 updatedModel
+                                onTick updatedModel
 
                             updatedTank =
                                 { tankLeft | x = tankLeft.x + (tankSpeed * tankLeft.dir) }
@@ -366,7 +366,7 @@ testUpdateFunctions =
                                 Model Play <| Game tankLeft [ Invader 0 -halfGameHeight -1 ] listOfMissiles
 
                             returnedModel =
-                                onTick 1 model
+                                onTick model
                         in
                         returnedModel.state |> Expect.equal GameOver
                 , test "updateTank updates the position of the tank" <|

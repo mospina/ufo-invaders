@@ -356,6 +356,7 @@ type Msg
      interp. KeyDown and KeyUp are keyboard events.
              Tick is a time based event
              Invade is a command to add random invaders
+
      -- <examples are redundant for enumerations>
 
    fnForMsg : Msg -> ...
@@ -363,7 +364,7 @@ type Msg
      case msg of
        KeyDown key -> ... key
        KeyUp key -> ... key
-       Tick x -> ... x
+       Tick tick -> ...
        Invade maybeInvader -> ...
 
    -- Template rules used:
@@ -380,10 +381,10 @@ update msg model =
         KeyUp key ->
             ( keyUp key model, Cmd.none )
 
-        Tick tick ->
+        Tick _ ->
             case model.state of
                 Play ->
-                    ( onTick tick model, Random.generate Invade generateInvader )
+                    ( onTick model, Random.generate Invade generateInvader )
 
                 _ ->
                     ( model, Cmd.none )
@@ -446,10 +447,10 @@ keyUp key model =
             model
 
 
-onTick : Float -> Model -> Model
-onTick tick model =
+onTick : Model -> Model
+onTick model =
     { model
-        | game = updateGame model.game tick
+        | game = updateGame model.game
         , state = checkState model.game
     }
 
@@ -487,8 +488,8 @@ onInvade game maybeInvader =
             game
 
 
-updateGame : Game -> Float -> Game
-updateGame game tick =
+updateGame : Game -> Game
+updateGame game =
     { game
         | tank = updateTank game.tank
         , invaders = updateInvaders game.invaders game.missiles
